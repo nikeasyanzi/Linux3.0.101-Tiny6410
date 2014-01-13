@@ -12,6 +12,7 @@
 #ifndef __ASM_ARCH_REGS_ADC_H
 #define __ASM_ARCH_REGS_ADC_H "regs-adc.h"
 
+
 #define S3C2410_ADCREG(x) (x)
 
 #define S3C2410_ADCCON	   S3C2410_ADCREG(0x00)
@@ -20,9 +21,7 @@
 #define S3C2410_ADCDAT0	   S3C2410_ADCREG(0x0C)
 #define S3C2410_ADCDAT1	   S3C2410_ADCREG(0x10)
 #define S3C64XX_ADCUPDN		S3C2410_ADCREG(0x14)
-#define S3C2443_ADCMUX		S3C2410_ADCREG(0x18)
 #define S3C64XX_ADCCLRINT	S3C2410_ADCREG(0x18)
-#define S5P_ADCMUX		S3C2410_ADCREG(0x1C)
 #define S3C64XX_ADCCLRINTPNDNUP	S3C2410_ADCREG(0x20)
 
 
@@ -34,7 +33,6 @@
 #define S3C2410_ADCCON_PRSCVLMASK	(0xFF<<6)
 #define S3C2410_ADCCON_SELMUX(x)	(((x)&0x7)<<3)
 #define S3C2410_ADCCON_MUXMASK		(0x7<<3)
-#define S3C2416_ADCCON_RESSEL		(1 << 3)
 #define S3C2410_ADCCON_STDBM		(1<<2)
 #define S3C2410_ADCCON_READ_START	(1<<1)
 #define S3C2410_ADCCON_ENABLE_START	(1<<0)
@@ -42,7 +40,6 @@
 
 
 /* ADCTSC Register Bits */
-#define S3C2443_ADCTSC_UD_SEN		(1 << 8)
 #define S3C2410_ADCTSC_YM_SEN		(1<<7)
 #define S3C2410_ADCTSC_YP_SEN		(1<<6)
 #define S3C2410_ADCTSC_XM_SEN		(1<<5)
@@ -63,9 +60,6 @@
 #define S3C2410_ADCDAT1_XY_PST		(0x3<<12)
 #define S3C2410_ADCDAT1_YPDATA_MASK	(0x03FF)
 
-#endif /* __ASM_ARCH_REGS_ADC_H */
-
-/* add */
 
 /*--------------------------- Common definitions for S3C  ---------------------------*/
 /* The following definitions will be applied to S3C24XX, S3C64XX, S5PC1XX.	     */
@@ -123,3 +117,7 @@
 #define S3C_ADCDAT1_XY_PST		(0x3<<12)
 #define S3C_ADCDAT1_YPDATA_MASK		(0x03FF)
 #define S3C_ADCDAT1_YPDATA_MASK_12BIT	(0x0FFF)
+
+
+#endif /* __ASM_ARCH_REGS_ADC_H */
+

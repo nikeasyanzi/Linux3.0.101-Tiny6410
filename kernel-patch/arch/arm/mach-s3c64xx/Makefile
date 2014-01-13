@@ -13,6 +13,7 @@ obj-				:=
 # Core files
 obj-y				+= cpu.o
 obj-y				+= clock.o
+obj-y				+= gpiolib.o
 
 # Core support for S3C6400 system
 
@@ -21,6 +22,10 @@ obj-$(CONFIG_CPU_S3C6410)	+= s3c6410.o
 
 obj-y				+= irq.o
 obj-y				+= irq-eint.o
+
+# CPU frequency scaling
+
+obj-$(CONFIG_CPU_FREQ_S3C64XX)  += cpufreq.o
 
 # DMA support
 
@@ -48,20 +53,23 @@ obj-$(CONFIG_MACH_ANW6410)	+= mach-anw6410.o
 obj-$(CONFIG_MACH_SMDK6400)	+= mach-smdk6400.o
 obj-$(CONFIG_MACH_SMDK6410)	+= mach-smdk6410.o
 obj-$(CONFIG_MACH_REAL6410)     += mach-real6410.o
+
+###### modify by chanfai ######
 obj-$(CONFIG_MACH_MINI6410)     += mach-mini6410.o mini6410-lcds.o
+
 obj-$(CONFIG_MACH_NCP)		+= mach-ncp.o
 obj-$(CONFIG_MACH_HMT)		+= mach-hmt.o
 obj-$(CONFIG_MACH_SMARTQ)	+= mach-smartq.o
 obj-$(CONFIG_MACH_SMARTQ5)	+= mach-smartq5.o
 obj-$(CONFIG_MACH_SMARTQ7)	+= mach-smartq7.o
-obj-$(CONFIG_MACH_WLF_CRAGG_6410) += mach-crag6410.o mach-crag6410-module.o
 
 # device support
 
 obj-y				+= dev-uart.o
 obj-y				+= dev-audio.o
 obj-$(CONFIG_S3C64XX_DEV_SPI)	+= dev-spi.o
-
-# add
 obj-$(CONFIG_S3C64XX_DEV_TS)	+= dev-ts.o
+obj-$(CONFIG_S3C64XX_DEV_ONENAND1)	+= dev-onenand1.o
+
+###### add by chanfai ######
 obj-$(CONFIG_TOUCHSCREEN_MINI6410)  += dev-ts-mini6410.o

@@ -63,9 +63,7 @@ config SND_SOC_SAMSUNG_SMDK_WM8580
 
 config SND_SOC_SAMSUNG_SMDK_WM8994
 	tristate "SoC I2S Audio support for WM8994 on SMDK"
-	depends on SND_SOC_SAMSUNG && (MACH_SMDKV310 || MACH_SMDKC210 || MACH_SMDK4212)
-	depends on I2C=y && GENERIC_HARDIRQS
-	select MFD_WM8994
+	depends on SND_SOC_SAMSUNG && (MACH_SMDKV310 || MACH_SMDKC210)
 	select SND_SOC_WM8994
 	select SND_SAMSUNG_I2S
 	help
@@ -143,14 +141,14 @@ config SND_SOC_SAMSUNG_SMDK_WM9713
 	help
 	  Sat Y if you want to add support for SoC audio on the SMDK.
 
-# add for mini6410 soundcard
 config SND_SOC_MINI6410_WM9713
 	tristate "SoC AC97 Audio support for Mini6410 with WM9713"
 	depends on SND_SOC_SAMSUNG && MACH_MINI6410
 	select SND_SOC_WM9713
 	select SND_SAMSUNG_AC97
 	help
-	  Sat Y if you want to add support for SoC audio on the FriendlyArm Mini6410 board.
+	  Say Y if you want to add support for SoC audio on the FriendlyARM
+	  Mini6410 board.
 
 config SND_SOC_SMARTQ
 	tristate "SoC I2S Audio support for SmartQ board"
@@ -161,9 +159,7 @@ config SND_SOC_SMARTQ
 config SND_SOC_GONI_AQUILA_WM8994
 	tristate "SoC I2S Audio support for AQUILA/GONI - WM8994"
 	depends on SND_SOC_SAMSUNG && (MACH_GONI || MACH_AQUILA)
-	depends on I2C=y && GENERIC_HARDIRQS
 	select SND_SAMSUNG_I2S
-	select MFD_WM8994
 	select SND_SOC_WM8994
 	help
 	  Say Y if you want to add support for SoC audio on goni or aquila
@@ -171,7 +167,7 @@ config SND_SOC_GONI_AQUILA_WM8994
 
 config SND_SOC_SAMSUNG_SMDK_SPDIF
 	tristate "SoC S/PDIF Audio support for SMDK"
-	depends on SND_SOC_SAMSUNG && (MACH_SMDKC100 || MACH_SMDKC110 || MACH_SMDKV210 || MACH_SMDKV310 || MACH_SMDK4212)
+	depends on SND_SOC_SAMSUNG && (MACH_SMDKC100 || MACH_SMDKC110 || MACH_SMDKV210)
 	select SND_SAMSUNG_SPDIF
 	help
 	  Say Y if you want to add support for SoC S/PDIF audio on the SMDK.
@@ -184,26 +180,9 @@ config SND_SOC_SMDK_WM8580_PCM
 	help
 	  Say Y if you want to add support for SoC audio on the SMDK.
 
-config SND_SOC_SMDK_WM8994_PCM
-	tristate "SoC PCM Audio support for WM8994 on SMDK"
-	depends on SND_SOC_SAMSUNG && (MACH_SMDKC210 || MACH_SMDKV310 || MACH_SMDK4212)
-	depends on I2C=y && GENERIC_HARDIRQS
-	select MFD_WM8994
-	select SND_SOC_WM8994
-	select SND_SAMSUNG_PCM
-	help
-	  Say Y if you want to add support for SoC audio on the SMDK
-
 config SND_SOC_SPEYSIDE
 	tristate "Audio support for Wolfson Speyside"
 	depends on SND_SOC_SAMSUNG && MACH_WLF_CRAGG_6410
 	select SND_SAMSUNG_I2S
-	select SND_SOC_WM8996
+	select SND_SOC_WM8915
 	select SND_SOC_WM9081
-	select SND_SOC_WM1250_EV1
-
-config SND_SOC_SPEYSIDE_WM8962
-	tristate "Audio support for Wolfson Speyside with WM8962"
-	depends on SND_SOC_SAMSUNG && MACH_WLF_CRAGG_6410
-	select SND_SAMSUNG_I2S
-	select SND_SOC_WM8962

@@ -29,11 +29,12 @@
 #include <asm/mach/map.h>
 
 #include <mach/map.h>
+#include <mach/regs-fb.h>
 #include <mach/regs-gpio.h>
 #include <mach/regs-modem.h>
 #include <mach/regs-srom.h>
+#include <mach/s3c6410.h>
 
-#include <plat/s3c6410.h>
 #include <plat/adc.h>
 #include <plat/cpu.h>
 #include <plat/devs.h>
@@ -41,27 +42,19 @@
 #include <plat/nand.h>
 #include <plat/regs-serial.h>
 // #include <plat/ts.h>
-#include <plat/regs-fb-v4.h>
 
 #include <video/platform_lcd.h>
 
-/* add */
+// add by chanfai
 #include <linux/delay.h>
 #include <linux/i2c.h>
+#include <linux/mmc/host.h>
 
-/* add touchscreen */
 #include <mach/ts.h>
 
-/* add for iic */
-#include <plat/iic.h>
-
-/* add for mmc */
-#include <linux/mmc/host.h>
 #include <plat/sdhci.h>
-
-/* add for soundcard */
+#include <plat/iic.h>
 #include <plat/audio.h>
-
 
 
 #define UCON S3C2410_UCON_DEFAULT
@@ -168,8 +161,7 @@ static struct s3c2410_platform_nand mini6410_nand_info = {
 	.sets		= mini6410_nand_sets,
 };
 
-
-/* MMC/SD config */
+/* add by chanfai MMC/SD config */
 static struct s3c_sdhci_platdata mini6410_hsmmc0_pdata = {
     .max_width      = 4,
     .cd_type        = S3C_SDHCI_CD_INTERNAL,
@@ -179,13 +171,6 @@ static struct s3c_sdhci_platdata mini6410_hsmmc1_pdata = {
     .max_width      = 4,
     .cd_type        = S3C_SDHCI_CD_PERMANENT,
 };
-
-/* framebuffer and LCD setup. */
-/* GPF15 = LCD backlight control
- * GPF13 => Panel power
- * GPN5 = LCD nRESET signal
- * PWM_TOUT1 => backlight brightness
- */
 
 static struct s3c_fb_pd_win mini6410_fb_win[] = {
 	{
@@ -224,7 +209,7 @@ static struct s3c_fb_platdata mini6410_lcd_pdata __initdata = {
 	.vidcon1	= VIDCON1_INV_HSYNC | VIDCON1_INV_VSYNC,
 };
 
-/* modify */
+/* modify by chanfai */
 static void mini6410_lcd_power_set(struct plat_lcd_data *pd,
 				   unsigned int power)
 {
@@ -253,7 +238,16 @@ static struct platform_device mini6410_lcd_powerdev = {
 	.dev.platform_data	= &mini6410_lcd_power_data,
 };
 
-/* add */
+/* modify by chanfai */
+#ifdef CONFIG_SAMSUNG_DEV_TS
+static struct s3c2410_ts_mach_info s3c_ts_platform __initdata = {
+	.delay			= 10000,
+	.presc			= 49,
+	.oversampling_shift	= 2,
+};
+#endif
+
+/* add by chanfai */
 #ifdef CONFIG_TOUCHSCREEN_MINI6410
 static struct s3c_ts_mach_info s3c_ts_platform __initdata = {
 	.delay			= 0xFFFF,
@@ -264,7 +258,7 @@ static struct s3c_ts_mach_info s3c_ts_platform __initdata = {
 };
 #endif
 
-/* add */
+/* add by chanfai */
 static struct map_desc mini6410_iodesc[] = {
 	{
 		/* LCD support */
@@ -275,12 +269,14 @@ static struct map_desc mini6410_iodesc[] = {
 	},
 };
 
+/* modify by chanfai */
 static struct platform_device *mini6410_devices[] __initdata = {
 	&mini6410_device_eth,
 
 #ifdef CONFIG_MINI6410_SD_CH0
 	&s3c_device_hsmmc0,
 #endif
+
 #ifdef CONFIG_MINI6410_SD_CH1
 	&s3c_device_hsmmc1,
 #endif
@@ -316,6 +312,7 @@ static struct platform_device *mini6410_devices[] __initdata = {
 
 };
 
+/* add by chanfai */
 static struct i2c_board_info i2c_devs0[] __initdata = {
 	{ I2C_BOARD_INFO("ov965x", 0x30), },
 };
@@ -324,14 +321,13 @@ static struct i2c_board_info i2c_devs1[] __initdata = {
 	/* Add your i2c device here */
 };
 
+/* modify by chanfai */
 static void __init mini6410_map_io(void)
 {
 	u32 tmp;
 
-	/* add */
-	s3c64xx_init_io(mini6410_iodesc, ARRAY_SIZE(mini6410_iodesc));
-
 	// s3c64xx_init_io(NULL, 0);
+	s3c64xx_init_io(mini6410_iodesc, ARRAY_SIZE(mini6410_iodesc));
 	s3c24xx_init_clocks(12000000);
 	s3c24xx_init_uarts(mini6410_uartcfgs, ARRAY_SIZE(mini6410_uartcfgs));
 
@@ -423,6 +419,7 @@ static void __init mini6410_machine_init(void)
 
 	s3c_nand_set_platdata(&mini6410_nand_info);
 	s3c_fb_set_platdata(&mini6410_lcd_pdata);
+	// s3c24xx_ts_set_platdata(&s3c_ts_platform);
 
 	/* add i2c */
 	s3c_i2c0_set_platdata(NULL);
@@ -430,8 +427,7 @@ static void __init mini6410_machine_init(void)
 	s3c_i2c1_set_platdata(NULL);
 #endif
 
-	// s3c24xx_ts_set_platdata(NULL);
-	/* add */
+	/* add for mini6410 touchscreen */
 #ifdef CONFIG_TOUCHSCREEN_MINI6410
 	s3c_ts_set_platdata(&s3c_ts_platform);
 #endif
@@ -442,7 +438,6 @@ static void __init mini6410_machine_init(void)
 
 	/* add for soundcard */
 	s3c64xx_ac97_setup_gpio(0);
-
 
 	/* configure nCS1 width to 16 bits */
 
@@ -464,6 +459,7 @@ static void __init mini6410_machine_init(void)
 		(4 << S3C64XX_SROM_BCX__TCOS__SHIFT) |
 		(0 << S3C64XX_SROM_BCX__TACS__SHIFT), S3C64XX_SROM_BC1);
 
+	/* add & modify for mini6410 lcd power */
 	gpio_request(S3C64XX_GPF(15), "LCD power");
 	gpio_request(S3C64XX_GPN(5), "LCD power");
 	gpio_request(S3C64XX_GPF(13), "LCD power");
@@ -481,7 +477,7 @@ static void __init mini6410_machine_init(void)
 
 MACHINE_START(MINI6410, "MINI6410")
 	/* Maintainer: Darius Augulis <augulis.darius@gmail.com> */
-	.atag_offset	= 0x100,
+	.boot_params	= S3C64XX_PA_SDRAM + 0x100,
 	.init_irq	= s3c6410_init_irq,
 	.map_io		= mini6410_map_io,
 	.init_machine	= mini6410_machine_init,

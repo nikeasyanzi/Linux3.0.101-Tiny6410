@@ -62,9 +62,6 @@
 #include <linux/cdev.h>
 #include <linux/miscdevice.h>
 
-/* add */
-#include <linux/sched.h>
-
 #include <asm/uaccess.h>
 #include <asm/io.h>
 #include <asm/irq.h>
@@ -77,6 +74,9 @@
 #include <mach/regs-gpio.h>
 #include <mach/gpio-bank-a.h>
 #include <mach/ts.h>
+
+/* add */
+#include <linux/sched.h>
 
 #define CONFIG_TOUCHSCREEN_S3C_DEBUG
 #undef CONFIG_TOUCHSCREEN_S3C_DEBUG
@@ -385,7 +385,7 @@ static irqreturn_t stylus_action(int irqno, void *param)
 #if defined(CONFIG_TOUCHSCREEN_NEW)
 		ts->yp += S3C_ADCDAT0_XPDATA_MASK_12BIT - (data0 & S3C_ADCDAT0_XPDATA_MASK_12BIT);
 		ts->xp += S3C_ADCDAT1_YPDATA_MASK_12BIT - (data1 & S3C_ADCDAT1_YPDATA_MASK_12BIT);
-#else 
+#else
 		ts->xp += data0 & S3C_ADCDAT0_XPDATA_MASK_12BIT;
 		ts->yp += data1 & S3C_ADCDAT1_YPDATA_MASK_12BIT;
 #endif
