@@ -51,10 +51,13 @@
 #include <linux/mmc/host.h>
 
 #include <mach/ts.h>
+#include <mach/regs-clock.h>
 
+#include <plat/clock.h>
 #include <plat/sdhci.h>
 #include <plat/iic.h>
 #include <plat/audio.h>
+#include <plat/regs-usb-hsotg-phy.h>
 
 
 #define UCON S3C2410_UCON_DEFAULT
@@ -238,6 +241,46 @@ static struct platform_device mini6410_lcd_powerdev = {
 	.dev.platform_data	= &mini6410_lcd_power_data,
 };
 
+
+/* add by chanfai, for support usb */
+#ifdef CONFIG_USB_SUPPORT
+/* Initializes OTG Phy. to output 48M clock */
+void s3c_otg_phy_config(int enable) {
+	u32 val;
+
+	if (enable) {
+		__raw_writel(0x0, S3C_PHYPWR);	/* Power up */
+
+		val = __raw_readl(S3C_PHYCLK);
+		val &= ~S3C_PHYCLK_CLKSEL_MASK;
+		__raw_writel(val, S3C_PHYCLK);
+
+		__raw_writel(0x1, S3C_RSTCON);
+		udelay(5);
+		__raw_writel(0x0, S3C_RSTCON);	/* Finish the reset */
+		udelay(5);
+	} else {
+		__raw_writel(0x19, S3C_PHYPWR);	/* Power down */
+	}
+}
+
+/* configure usb host clock */
+void s3c_usb_clk_config(void)
+{
+	/* UHOST_RATIO = 1 */
+	__raw_writel(__raw_readl(S3C_CLK_DIV1) & 0xff0fffff, S3C_CLK_DIV1);
+	/* UHOST_SEL = MOUNTepll, EPLL_SEL=1 */
+	__raw_writel(__raw_readl(S3C_CLK_SRC) & 0xffffff9b | 0x24, S3C_CLK_SRC);
+
+	/* enable HCLK gate */
+	__raw_writel(__raw_readl(S3C_HCLK_GATE) | S3C_CLKCON_HCLK_UHOST | S3C_CLKCON_HCLK_USB, S3C_HCLK_GATE);
+	/* enable SCLK gate */
+	__raw_writel(__raw_readl(S3C_SCLK_GATE) | S3C_CLKCON_SCLK_UHOST, S3C_SCLK_GATE);
+}
+
+EXPORT_SYMBOL(s3c_otg_phy_config);
+#endif
+
 /* modify by chanfai */
 #ifdef CONFIG_SAMSUNG_DEV_TS
 static struct s3c2410_ts_mach_info s3c_ts_platform __initdata = {
@@ -287,6 +330,7 @@ static struct platform_device *mini6410_devices[] __initdata = {
 #endif
 
 	&s3c_device_ohci,
+	&s3c_device_usb_hsotg,
 	&s3c_device_nand,
 	&s3c_device_fb,
 	&mini6410_lcd_powerdev,
@@ -438,6 +482,12 @@ static void __init mini6410_machine_init(void)
 
 	/* add for soundcard */
 	s3c64xx_ac97_setup_gpio(0);
+
+	/* add for usb host */
+#ifdef CONFIG_USB_SUPPORT
+	s3c_usb_clk_config();
+	s3c_otg_phy_config(1);
+#endif	
 
 	/* configure nCS1 width to 16 bits */
 

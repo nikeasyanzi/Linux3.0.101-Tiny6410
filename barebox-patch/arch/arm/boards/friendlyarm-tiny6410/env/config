@@ -1,0 +1,48 @@
+#!/bin/sh
+
+machine=tiny6410
+eth0.serverip=192.168.1.100
+user=chanfai
+
+# use 'dhcp' to do dhcp in barebox and in kernel
+# use 'none' if you want to skip kernel ip autoconfiguration
+ip=static
+
+# or set your networking parameters here
+eth0.ipaddr=192.168.1.101
+eth0.netmask=255.255.255.0
+eth0.gateway=192.168.1.254
+eth0.ethaddr=12:34:56:78:90:ab
+
+# can be either 'nfs', 'tftp' or 'nand'
+kernel_loc=tftp
+# can be either 'net', 'nand' or 'initrd'
+rootfs_loc=net
+
+# can be either 'jffs2' or 'ubifs'
+#rootfs_type=ubifs
+#rootfsimage=root-${machine}.${rootfs_type}
+
+# The image type of the kernel. Can be uimage, zimage, raw, or raw_lzo
+kernelimage_type=zimage
+kernelimage=zImage
+
+# add tftp direction
+mkdir -p /mnt/tftp
+
+# nfs filesystem
+nfsroot="${eth0.serverip}:/home/${user}/workspace/rootfs"
+
+autoboot_timeout=0
+
+#
+# "tiny6410" kernel parameter
+# 0 .. 9 = screen type
+# i = touchscreen with propritary FriendlyARM protocol
+# Note: can be "tiny6410= " if nothing of these components are connected
+#
+bootargs="console=ttySAC0,115200 tiny6410=0 root=/dev/nfs nfsroot=$nfsroot"
+
+# nand_device="nand"
+# nand_parts="256k(barebox),128k(bareboxenv),1536k(kernel),-(root)"
+# rootfs_mtdblock_nand=3
