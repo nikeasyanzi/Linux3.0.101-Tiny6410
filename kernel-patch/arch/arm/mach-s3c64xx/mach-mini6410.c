@@ -129,22 +129,25 @@ static struct platform_device mini6410_device_eth = {
 	},
 };
 
-static struct mtd_partition mini6410_nand_part[] = {
-	[0] = {
-		.name	= "uboot",
-		.size	= SZ_1M,
-		.offset	= 0,
+/* modify by chanfai, add Nand flash info */
+struct mtd_partition mini6410_nand_part[] = {
+	{
+		.name		= "Bootloader",
+		.offset		= 0,
+		.size		= (4 * 128 *SZ_1K),
+		.mask_flags	= MTD_CAP_NANDFLASH,
 	},
-	[1] = {
-		.name	= "kernel",
-		.size	= SZ_2M,
-		.offset	= SZ_1M,
+	{
+		.name		= "Kernel",
+		.offset		= (4 * 128 *SZ_1K),
+		.size		= (5*SZ_1M) ,
+		.mask_flags	= MTD_CAP_NANDFLASH,
 	},
-	[2] = {
-		.name	= "rootfs",
-		.size	= MTDPART_SIZ_FULL,
-		.offset	= SZ_1M + SZ_2M,
-	},
+	{
+		.name		= "File System",
+		.offset		= MTDPART_OFS_APPEND,
+		.size		= MTDPART_SIZ_FULL,
+	}
 };
 
 static struct s3c2410_nand_set mini6410_nand_sets[] = {
@@ -270,12 +273,13 @@ void s3c_usb_clk_config(void)
 	/* UHOST_RATIO = 1 */
 	__raw_writel(__raw_readl(S3C_CLK_DIV1) & 0xff0fffff, S3C_CLK_DIV1);
 	/* UHOST_SEL = MOUNTepll, EPLL_SEL=1 */
-	__raw_writel(__raw_readl(S3C_CLK_SRC) & 0xffffff9b | 0x24, S3C_CLK_SRC);
+	__raw_writel((__raw_readl(S3C_CLK_SRC) & 0xffffff9b) | 0x24, S3C_CLK_SRC);
 
+	/* here default disable usb & usb-otg clock gate ctrl, because do it in bootloader */
 	/* enable HCLK gate */
-	__raw_writel(__raw_readl(S3C_HCLK_GATE) | S3C_CLKCON_HCLK_UHOST | S3C_CLKCON_HCLK_USB, S3C_HCLK_GATE);
+	// __raw_writel(__raw_readl(S3C_HCLK_GATE) | S3C_CLKCON_HCLK_UHOST | S3C_CLKCON_HCLK_USB, S3C_HCLK_GATE);
 	/* enable SCLK gate */
-	__raw_writel(__raw_readl(S3C_SCLK_GATE) | S3C_CLKCON_SCLK_UHOST, S3C_SCLK_GATE);
+	// __raw_writel(__raw_readl(S3C_SCLK_GATE) | S3C_CLKCON_SCLK_UHOST, S3C_SCLK_GATE);
 }
 
 EXPORT_SYMBOL(s3c_otg_phy_config);
@@ -474,6 +478,11 @@ static void __init mini6410_machine_init(void)
 	/* add for mini6410 touchscreen */
 #ifdef CONFIG_TOUCHSCREEN_MINI6410
 	s3c_ts_set_platdata(&s3c_ts_platform);
+#endif
+
+	/* add s3c nand name */
+#ifdef CONFIG_MTD_NAND_S3C
+	s3c_device_nand.name = "s3c6410-nand";
 #endif
 
 	/* add for mmc platform data */
